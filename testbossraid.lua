@@ -35,9 +35,9 @@ local function handleQueuedTeleport()
 end
 
 local function handleKisukeInteraction()
-	local Kisuke = Workspace.NPCs.RaidBoss.Kisuke
+	local Kisuke = Workspace:FindFirstChild("NPCs"):FindFirstChild("RaidBoss"):FindFirstChild("Kisuke")
 	if Kisuke and plr.Character and plr.Character:FindFirstChild("CharacterHandler") then
-		if plr.PlayerGui.MissionsUI.MainFrame.Visible then
+		if plr.PlayerGui:FindFirstChild("MissionsUI").MainFrame.Visible then
 			if not plr:FindFirstChild("Kisuke") then
 				fireclickdetector(Kisuke:FindFirstChildWhichIsA("ClickDetector"))
 			else
@@ -52,34 +52,39 @@ local function handleKisukeInteraction()
 end
 
 local function handleCombat(target)
-	plr.Character.HumanoidRootPart.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0, 10, 0) * CFrame.Angles(math.rad(-90), 0, 0)
-	plr.Character.HumanoidRootPart.Velocity = Vector3.new()
-	if plr.Character:FindFirstChild("Zanpakuto") then
-		plr.Character.CharacterHandler.Remotes.Weapon:FireServer()
-	end
-	combat:FireServer("LightAttack")
-	getgenv().skill = readfile("skill.lua")
-	if getgenv().skill then
-		local ohString1 = getgenv().skill
-		local ohString2 = "Released"
-		plr.Character.CharacterHandler.Remotes.Skill:FireServer(ohString1, ohString2)
+	local humanoidRootPart = plr.Character:FindFirstChild("HumanoidRootPart")
+	if humanoidRootPart and target:FindFirstChild("HumanoidRootPart") then
+		humanoidRootPart.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0, 10, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+		humanoidRootPart.Velocity = Vector3.new()
+		if plr.Character:FindFirstChild("Zanpakuto") then
+			plr.Character.CharacterHandler.Remotes.Weapon:FireServer()
+		end
+		combat:FireServer("LightAttack")
+		getgenv().skill = readfile("skill.lua")
+		if getgenv().skill then
+			local ohString1 = getgenv().skill
+			local ohString2 = "Released"
+			plr.Character.CharacterHandler.Remotes.Skill:FireServer(ohString1, ohString2)
+		end
 	end
 end
 
 local function handleLowHealthCombat(target)
-	plr.Character.HumanoidRootPart.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0,
-50, 0) * CFrame.Angles(math.rad(-90), 0, 0)
-	getgenv().skill = readfile("skill.lua")
-	if getgenv().skill then
-		local ohString1 = "Skill"
-		local ohString2 = getgenv().skill
-		local ohString3 = "Pressed"
-		ReplicatedStorage.Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3)
+	local humanoidRootPart = plr.Character:FindFirstChild("HumanoidRootPart")
+	if humanoidRootPart and target:FindFirstChild("HumanoidRootPart") then
+		humanoidRootPart.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0, 50, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+		getgenv().skill = readfile("skill.lua")
+		if getgenv().skill then
+			local ohString1 = "Skill"
+			local ohString2 = getgenv().skill
+			local ohString3 = "Pressed"
+			ReplicatedStorage.Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3)
+		end
 	end
 end
 
 local function isKarakuraTown()
-	local Kisuke = Workspace.NPCs.RaidBoss.Kisuke
+	local Kisuke = Workspace:FindFirstChild("NPCs"):FindFirstChild("RaidBoss"):FindFirstChild("Kisuke")
 	if Kisuke and plr.Character and plr.Character:FindFirstChild("CharacterHandler") then
 		handleKisukeInteraction()
 	end
@@ -87,7 +92,7 @@ end
 
 local function isBossRaidMap()
 	if not plr.Character then return end
-	for _, target in next, Workspace.Entities:GetChildren() do
+	for _, target in ipairs(Workspace.Entities:GetChildren()) do
 		if target.Name ~= plr.Name and target:FindFirstChild("Head") then
 			if (plr.Character.Humanoid.Health / plr.Character.Humanoid.MaxHealth) * 100 > 30 then
 				handleCombat(target)
@@ -106,7 +111,7 @@ local function handleOtherPlaces()
 		ReplicatedStorage.Requests.RequestCCList:InvokeServer()
 		local function teleport()
 			if serverlist and not _G.Teleporting then
-				for _, server in next, serverlist do
+				for _, server in ipairs(serverlist) do
 					plr.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town", server["JobID"])
 					_G.Teleporting = true
 				end
